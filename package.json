@@ -1,11 +1,12 @@
 {
 	"name": "geoip-city",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Geolocation lookup by ip address from MaxMind GeoLite2 database",
 	"keywords": [
 		"geo",
 		"geoip",
 		"ip",
+		"ip-city",
 		"ipv4",
 		"ipv6",
 		"geolookup",
@@ -18,7 +19,7 @@
 		"lib/",
 		"data/",
 		"test/",
-		"scripts/",
+		"scripts/*.js",
 		"LICENSE",
 		"EULA"
 	],
