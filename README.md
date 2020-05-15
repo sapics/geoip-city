@@ -1,44 +1,18 @@
-GeoIP-lite
+# geoip-city [![NPM version](https://badge.fury.io/js/geoip-city.svg)](https://badge.fury.io/js/geoip-city)
 ==========
 
-A native NodeJS API for the GeoLite data from MaxMind.
+This product includes GeoLite2 ipv4 and ipv6 city data which created by MaxMind, available from https://www.maxmind.com.
+The database of this product **updates weekly**.
 
-This product includes GeoLite data created by MaxMind, available from http://maxmind.com/
+**You should read this README and the LICENSE and EULA files carefully before deciding to use this product.**
 
-[![Build Status](https://travis-ci.org/bluesmoon/node-geoip.svg?branch=master "node-geoip on Travis")](https://travis-ci.org/bluesmoon/node-geoip)
+This is the forked of [geoip-lite](https://github.com/bluesmoon/node-geoip).
 
-introduction
-------------
 
-MaxMind provides a set of data files for IP to Geo mapping along with opensource libraries to parse and lookup these data files.
-One would typically write a wrapper around their C API to get access to this data in other languages (like JavaScript).
-
-GeoIP-lite instead attempts to be a fully native JavaScript library.  A converter script converts the CSV files from MaxMind into
-an internal binary format (note that this is different from the binary data format provided by MaxMind).  The geoip module uses this
-binary file to lookup IP addresses and return the country, region and city that it maps to.
-
-philosophy
-----------
-
-I was really aiming for a fast JavaScript native implementation for geomapping of IPs.  My prime motivator was the fact that it was
-really hard to get libgeoip built for Mac OSX without using the library from MacPorts.
-
-why geoip-lite
---------------
-
-So why are we called geoip-lite?  `npm` already has a [geoip package](http://search.npmjs.org/#/geoip) which provides a JavaScript
-binding around libgeoip from MaxMind.  The `geoip` package is fully featured and supports everything that the MaxMind APIs support,
-however, it requires `libgeoip` to be installed on your system.
-
-`geoip-lite` on the other hand is a fully JavaScript implementation.  It is not as fully featured as `geoip` however, by reducing its
-scope, it is about 40% faster at doing lookups.  On average, an IP to Location lookup should take 20 microseconds on a Macbook Pro.
-IPv4 addresses take about 6 microseconds, while IPv6 addresses take about 30 microseconds.
-
-synopsis
---------
+## Synopsis
 
 ```javascript
-var geoip = require('geoip-lite');
+var geoip = require('geoip-city');
 
 var ip = "207.97.227.239";
 var geo = geoip.lookup(ip);
@@ -57,26 +31,24 @@ console.log(geo);
 
 ```
 
-installation
-------------
-### 1. get the library
+## Installation
 
-    $ npm install geoip-lite
+### 1. Install the library
 
-### 2. update the datafiles (optional)
+    $ npm install geoip-city
 
-Run `cd node_modules/geoip-lite && npm run-script updatedb license_key=YOUR_LICENSE_KEY` to update the data files. (Replace `YOUR_LICENSE_KEY` with your license key obtained from [maxmind.com](https://support.maxmind.com/account-faq/account-related/how-do-i-generate-a-license-key/))
+### 2. Update MaxMind's geoip data
 
-You can create maxmind account [here](https://www.maxmind.com/en/geolite2/signup)
+    $ npm run-script updatedb --license_key=YOUR_GEOLITE2_LICENSE_KEY
+		or
+    $ GEOLITE2_LICENSE_KEY=YOUR_GEOLITE2_LICENSE_KEY node scripts/updatedb.js
 
-**NOTE** that this requires a lot of RAM.  It is known to fail on on a Digital Ocean or AWS micro instance.
-There are no plans to change this.  `geoip-lite` stores all data in RAM in order to be fast.
+_YOUR_GEOLITE2_LICENSE_KEY should be replaced by a valid GeoLite2 license key. Please [follow instructions](https://dev.maxmind.com/geoip/geoip2/geolite2/) provided by MaxMind to obtain a license key._
 
-API
----
 
-geoip-lite is completely synchronous.  There are no callbacks involved.  All blocking file IO is done at startup time, so all runtime
-calls are executed in-memory and are fast.  Startup may take up to 200ms while it reads into memory and indexes data files.
+## API
+
+geoip-city is completely synchronous.  There are no callbacks involved.  All blocking file IO is done at startup time, so all runtime calls are executed in-memory and are fast.  Startup may take up to 200ms while it reads into memory and indexes data files.
 
 ### Looking up an IP address ###
 
@@ -103,14 +75,17 @@ If the IP address was found, the `lookup` method returns an object with the foll
    city: "City Name",             // This is the full city name
    ll: [<latitude>, <longitude>], // The latitude and longitude of the city
    metro: <metro code>,           // Metro code
-   area: <accuracy_radius>        // The approximate accuracy radius (km), around the latitude and longitude
+   area: <accuracy_radius>,       // The approximate accuracy radius (km), around the latitude and longitude
+   postalCode:  '04300'           // Postal code
 }
 ```
 
 The actual values for the `range` array depend on whether the IP is IPv4 or IPv6 and should be
-considered internal to `geoip-lite`.  To get a human readable format, pass them to `geoip.pretty()`
+considered internal to `geoip-city`.
+To get a human readable format, pass them to `geoip.pretty()`
 
 If the IP address was not found, the `lookup` returns `null`
+
 
 ### Pretty printing an IP address ###
 
@@ -121,107 +96,38 @@ the `pretty` method can be used to turn it into a human readable string.
     console.log("The IP is %s", geoip.pretty(ip));
 ```
 
-This method returns a string if the input was in a format that `geoip-lite` can recognise, else it returns the
+This method returns a string if the input was in a format that `geoip-city` can recognise, else it returns the
 input itself.
 
-Built-in Updater
-----------------
+
+## Built-in Updater
 
 This package contains an update script that can pull the files from MaxMind and handle the conversion from CSV.
 A npm script alias has been setup to make this process easy. Please keep in mind this requires internet and MaxMind
 rate limits that amount of downloads on their servers.
 
-You will need, at minimum, a free license key obtained from [maxmind.com](https://support.maxmind.com/account-faq/account-related/how-do-i-generate-a-license-key/) to run the update script.
-
-Package stores checksums of MaxMind data and by default only downloads them if checksums have changed.
-
-### Ways to update data ###
-
 ```shell
-#update data if new data is available
-npm run-script updatedb license_key=YOUR_LICENSE_KEY
-
-#force udpate data even if checkums have not changed
-npm run-script updatedb-force license_key=YOUR_LICENSE_KEY
+npm run-script updatedb --license_key=YOUR_GEOLITE2_LICENSE_KEY
+	or
+GEOLITE2_LICENSE_KEY=YOUR_GEOLITE2_LICENSE_KEY node scripts/updatedb.js
 ```
 
-You can also run it by doing:
+_YOUR_GEOLITE2_LICENSE_KEY should be replaced by a valid GeoLite2 license key. Please [follow instructions](https://dev.maxmind.com/geoip/geoip2/geolite2/) provided by MaxMind to obtain a license key._
 
-```bash
-node ./node_modules/geoip-lite/scripts/updatedb.js license_key=YOUR_LICENSE_KEY
-```
 
-### Ways to reload data in your app when update finished ###
+## License and EULA
 
-If you have a server running `geoip-lite`, and you want to reload its geo data, after you finished update, without a restart.
+Please carefully read the LICENSE and EULA files. This package comes with certain restrictions and obligations, most notably:
+ - You cannot prevent the library from updating the databases.
+ - You cannot use the GeoLite2 data:
+   - for FCRA purposes,
+   - to identify specific households or individuals.
 
-#### Programmatically ####
+You can read [the latest version of GeoLite2 EULA](https://www.maxmind.com/en/geolite2/eula).
 
-You can do it programmatically, calling after scheduled data updates
 
-```javascript
-//Synchronously
-geoip.reloadDataSync();
-
-//Asynchronously
-geoip.reloadData(function(){
-    console.log("Done");
-});
-```
-
-#### Automatic Start and stop watching for data updates ####
-
-You can enable the data watcher to automatically refresh in-memory geo data when a file changes in the data directory.
-
-```javascript
-geoip.startWatchingDataUpdate();
-```
-
-This tool can be used with `npm run-script updatedb` to periodically update geo data on a running server.
-
-Caveats
--------
-
-This package includes the GeoLite database from MaxMind.  This database is not the most accurate database available,
-however it is the best available for free.  You can use the commercial GeoIP database from MaxMind with better
-accuracy by buying a license from MaxMind, and then using the conversion utility to convert it to a format that
-geoip-lite understands.  You will need to use the `.csv` files from MaxMind for conversion.
-
-Also note that on occassion, the library may take up to 5 seconds to load into memory.  This is largely dependent on
-how busy your disk is at that time.  It can take as little as 200ms on a lightly loaded disk.  This is a one time
-cost though, and you make it up at run time with very fast lookups.
-
-### Memory usage ###
-
-Quick test on memory consumption shows that library uses around 100Mb per process
-
-```javascript
-    var geoip = require('geoip-lite');
-    console.log(process.memoryUsage());
-    /**
-    * Outputs:
-    * {
-    *     rss: 126365696,
-    *     heapTotal: 10305536,
-    *     heapUsed: 5168944,
-    *     external: 104347120
-    * }
-    **/
-```
-
-References
-----------
-  - <a href="http://www.maxmind.com/app/iso3166">Documentation from MaxMind</a>
-  - <a href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166 (1 & 2) codes</a>
-  - <a href="http://en.wikipedia.org/wiki/List_of_FIPS_region_codes">FIPS region codes</a>
-
-Copyright
----------
-
-`geoip-lite` is Copyright 2011-2018 Philip Tellis <philip@bluesmoon.info> and the latest version of the code is
-available at https://github.com/bluesmoon/node-geoip
-
-License
--------
-
-There are two licenses for the code and data.  See the [LICENSE](https://github.com/bluesmoon/node-geoip/blob/master/LICENSE) file for details.
+## References
+  - <a href="https://www.maxmind.com/en/geolite2/eula">GeoLite2 EULA</a>
+  - <a href="https://www.maxmind.com/app/iso3166">Documentation from MaxMind</a>
+  - <a href="https://en.wikipedia.org/wiki/ISO_3166">ISO 3166 (1 & 2) codes</a>
+  - <a href="https://en.wikipedia.org/wiki/List_of_FIPS_region_codes">FIPS region codes</a>

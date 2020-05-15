@@ -1,16 +1,36 @@
 {
-	"name"        :  "geoip-lite",
-	"version"     :  "1.4.2",
-	"description" :  "A light weight native JavaScript implementation of GeoIP API from MaxMind",
-	"keywords"    :  ["geo", "geoip", "ip", "ipv4", "ipv6", "geolookup", "maxmind", "geolite"],
-	"homepage"    :  "https://github.com/geoip-lite/node-geoip",
-	"author"      :  "Philip Tellis <philip@bluesmoon.info> (http://bluesmoon.info/)",
-	"files"       :  ["lib/", "data/", "test/","scripts/"],
-	"main"        :  "lib/geoip.js",
-	"repository"  :  { "type": "git", "url": "git://github.com/geoip-lite/node-geoip.git" },
-	"engines"     :  { "node": ">=5.10.0" },
+	"name": "geoip-city",
+	"version": "1.0.0",
+	"description": "Geolocation lookup by ip address from MaxMind GeoLite2 database",
+	"keywords": [
+		"geo",
+		"geoip",
+		"ip",
+		"ipv4",
+		"ipv6",
+		"geolookup",
+		"maxmind",
+		"geolite"
+	],
+	"homepage": "https://github.com/sapics/geoip-city",
+	"author": "sapics (https://github.com/sapics)",
+	"files": [
+		"lib/",
+		"data/",
+		"test/",
+		"scripts/",
+		"LICENSE",
+		"EULA"
+	],
+	"main": "lib/geoip.js",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/sapics/geoip-city.git"
+	},
+	"engines": {
+		"node": ">=5.10.0"
+	},
 	"scripts": {
-        "pretest": "eslint .",
 		"test": "nodeunit --reporter=minimal test/tests.js",
 		"updatedb": "node scripts/updatedb.js",
 		"updatedb-debug": "node scripts/updatedb.js debug",
@@ -25,12 +45,8 @@
 		"rimraf": "^2.5.2",
 		"yauzl": "^2.9.2"
 	},
-	"config": {
-		"update": true
-	},
 	"devDependencies": {
-		"eslint": "^5.12.1",
-		"nodeunit": "^0.11.2"
+		"nodeunit-x": "^0.13.0"
 	},
-	"license": "Apache-2.0"
+	"license": "MaxMind GeoLite2 License"
 }

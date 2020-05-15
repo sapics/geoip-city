@@ -24,36 +24,16 @@ var Address6 = require('ip-address').Address6;
 var Address4 = require('ip-address').Address4;
 
 var args = process.argv.slice(2);
-var license_key = args.find(function(arg) {
-	return arg.match(/^license_key=[a-zA-Z0-9]+/) !== null;
-});
-if (typeof license_key === 'undefined' && typeof process.env.LICENSE_KEY !== 'undefined') {
-	license_key = 'license_key='+process.env.LICENSE_KEY;
-}
+var license_key = process.env.npm_config_license_key || process.env.GEOLITE2_LICENSE_KEY || null;
+
 var dataPath = path.join(__dirname, '..', 'data');
 var tmpPath = path.join(__dirname, '..', 'tmp');
 var countryLookup = {};
 var cityLookup = {};
 var databases = [
 	{
-		type: 'country',
-		url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip&'+license_key,
-		checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country-CSV&suffix=zip.md5&'+license_key,
-		fileName: 'GeoLite2-Country-CSV.zip',
-		src: [
-			'GeoLite2-Country-Locations-en.csv',
-			'GeoLite2-Country-Blocks-IPv4.csv',
-			'GeoLite2-Country-Blocks-IPv6.csv'
-		],
-		dest: [
-			'',
-			'geoip-country.dat',
-			'geoip-country6.dat'
-		]
-	},
-	{
 		type: 'city',
-		url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&'+license_key,
+		url: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip&license_key=' + license_key,
 		checksum: 'https://geoip.maxmind.com/app/geoip_download?edition_id=GeoLite2-City-CSV&suffix=zip.md5&'+license_key,
 		fileName: 'GeoLite2-City-CSV.zip',
 		src: [
@@ -144,11 +124,11 @@ function getHTTPOptions(downloadUrl) {
 }
 
 function check(database, cb) {
-	if (args.indexOf("force") !== -1) {
+//	if (args.indexOf("force") !== -1) {
 		//we are forcing database upgrade,
 		//so not even using checksums
 		return cb(null, database);
-	}
+//	}
 	
 	var checksumUrl = database.checksum;
     
@@ -636,7 +616,6 @@ rimraf(tmpPath);
 mkdir(tmpPath);
 
 async.eachSeries(databases, function(database, nextDatabase) {
-
 	async.seq(check, fetch, extract, processData, updateChecksum)(database, nextDatabase);
 
 }, function(err) {
